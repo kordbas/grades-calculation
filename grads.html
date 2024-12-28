@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEU-DS ( Grades Calculation )</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #ffffff, #dfe9f3);
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1em;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        th {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f4f8fb;
+        }
+
+        tr:hover {
+            background-color: #e8f1fa;
+            transition: background-color 0.3s;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #2575fc;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            margin: 10px 5px;
+            padding: 12px 25px;
+            font-size: 1em;
+            cursor: pointer;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #2575fc, #6a11cb);
+            transform: scale(1.05);
+        }
+
+        button:active {
+            background: #1c4b82;
+            transform: scale(0.95);
+        }
+
+        select {
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 90%;
+            box-sizing: border-box;
+            background: #f4f8fb;
+            color: #333;
+        }
+
+        .container {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            table, th, td {
+                font-size: 0.9em;
+            }
+
+            button {
+                padding: 8px 20px;
+                font-size: 0.9em;
+            }
+
+            .result {
+                font-size: 1.2em;
+            }
+
+            header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>SEU-DS ( Grades Calculation )</h1>
+    </header>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credit Hours</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody id="courseTable">
+            <tr>
+                <td>1</td>
+                <td>
+                    <select class="course-code-dropdown" onchange="updateCourseDetails(this)">
+                        <option value="">Select Code</option>
+                        <option value="CS001">CS001</option>
+                        <option value="CI001">CI001</option>
+                        <option value="MATH001">MATH001</option>
+                        <option value="COMM001">COMM001</option>
+                        <option value="ISLM101">ISLM101</option>
+                        <option value="ISLM102">ISLM102</option>
+                        <option value="ISLM103">ISLM103</option>
+                        <option value="ISLM104">ISLM104</option>
+                        <option value="DS230">DS230</option>
+                        <option value="ENG103">ENG103</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="course-name" readonly>
+                </td>
+                <td>
+                    <input type="text" class="credit-hours" readonly>
+                </td>
+                <td>
+                    <select class="grade-dropdown">
+                        <option value="">Select Grade</option>
+                        <option value="4.0">A+</option>
+                        <option value="3.75">A</option>
+                        <option value="3.5">B+</option>
+                        <option value="3.0">B</option>
+                        <option value="2.5">C+</option>
+                        <option value="2.0">C</option>
+                        <option value="1.5">D+</option>
+                        <option value="1.0">D</option>
+                        <option value="0.0">F</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="container">
+        <button onclick="addRow()">Add Another Course</button>
+        <button onclick="calculateGPA()">Calculate GPA</button>
+        <button onclick="clearInputs()">Clear Inputs</button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        const courseMapping = {
+            "CS001": { name: "Computer Essentials", hours: 3 },
+            "CI001": { name: "Academic Skills", hours: 2 },
+            "MATH001": { name: "Fundamentals of Mathematics", hours: 3 },
+            "COMM001": { name: "Communication Skills", hours: 2 },
+            "ISLM101": { name: "ISLAMIC FAITH", hours: 2 },
+            "ISLM102": { name: "PROFESSIONAL CONDUCT & ETHICS IN ISLAM", hours: 2 },
+            "ISLM103": { name: "ISLAMIC ECONOMIC SYSTEM", hours: 2 },
+            "ISLM104": { name: "ISLAMIC SOCIAL SYSTEM", hours: 2 },
+            "DS230": { name: "Object Oriented Programming", hours: 3 },
+            "ENG103": { name: "Technical Writing", hours: 3 }
+        };
+
+        function addRow() {
+            const table = document.getElementById('courseTable');
+            const rowCount = table.rows.length + 1;
+            const row = table.insertRow();
+
+            row.innerHTML = `
+                <td>${rowCount}</td>
+                <td>
+                    <select class="course-code-dropdown" onchange="updateCourseDetails(this)">
+                        <option value="">Select Code</option>
+                        ${Object.keys(courseMapping).map(code => `<option value="${code}">${code}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" class="course-name" readonly>
+                </td>
+                <td>
+                    <input type="text" class="credit-hours" readonly>
+                </td>
+                <td>
+                    <select class="grade-dropdown">
+                        <option value="">Select Grade</option>
+                        <option value="4.0">A+</option>
+                        <option value="3.75">A</option>
+                        <option value="3.5">B+</option>
+                        <option value="3.0">B</option>
+                        <option value="2.5">C+</option>
+                        <option value="2.0">C</option>
+                        <option value="1.5">D+</option>
+                        <option value="1.0">D</option>
+                        <option value="0.0">F</option>
+                    </select>
+                </td>
+            `;
+        }
+
+        function updateCourseDetails(selectElement) {
+            const courseCode = selectElement.value;
+            const courseNameInput = selectElement.closest('td').nextElementSibling.querySelector('.course-name');
+            const creditHoursInput = selectElement.closest('td').nextElementSibling.nextElementSibling.querySelector('.credit-hours');
+
+            if (courseMapping[courseCode]) {
+                courseNameInput.value = courseMapping[courseCode].name;
+                creditHoursInput.value = courseMapping[courseCode].hours;
+            } else {
+                courseNameInput.value = "";
+                creditHoursInput.value = "";
+            }
+        }
+
+        function calculateGPA() {
+            const grades = document.querySelectorAll('.grade-dropdown');
+            const hours = document.querySelectorAll('.credit-hours');
+
+            let totalPoints = 0;
+            let totalHours = 0;
+
+            grades.forEach((grade, index) => {
+                const gradeValue = parseFloat(grade.value);
+                const hourValue = parseFloat(hours[index].value);
+
+                if (!isNaN(gradeValue) && !isNaN(hourValue)) {
+                    totalPoints += gradeValue * hourValue;
+                    totalHours += hourValue;
+                }
+            });
+
+            const gpa = totalHours > 0 ? (totalPoints / totalHours).toFixed(2) : "0.00";
+            document.getElementById('result').innerText = `Total GPA: ${gpa}`;
+        }
+
+        function clearInputs() {
+            const grades = document.querySelectorAll('.grade-dropdown');
+            const hours = document.querySelectorAll('.credit-hours');
+            const courseNames = document.querySelectorAll('.course-name');
+            const codes = document.querySelectorAll('.course-code-dropdown');
+
+            grades.forEach(grade => grade.value = "");
+            hours.forEach(hour => hour.value = "");
+            courseNames.forEach(name => name.value = "");
+            codes.forEach(code => code.value = "");
+
+            document.getElementById('result').innerText = "";
+        }
+    </script>
+</body>
+</html>
